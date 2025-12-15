@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import HTTPException, Request, status
 
 from src.order_management_service.core.redis import redis_client
 from src.order_management_service.core.settings import (
@@ -20,6 +20,3 @@ async def rate_limiter_dependency(request: Request) -> None:
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Too many requests",
         )
-
-
-RateLimiter = Depends(rate_limiter_dependency)

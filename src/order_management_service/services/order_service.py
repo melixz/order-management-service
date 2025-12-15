@@ -44,7 +44,10 @@ async def create_order(
     )
 
     response = OrderResponse.model_validate(order)
-    await set_order_to_cache(str(order.id), json.dumps(response.model_dump()))
+    await set_order_to_cache(
+        str(order.id),
+        json.dumps(response.model_dump(mode="json")),
+    )
 
     return order
 
@@ -64,7 +67,10 @@ async def get_order_by_id(db: AsyncSession, order_id: UUID) -> OrderResponse:
         )
 
     response = OrderResponse.model_validate(order)
-    await set_order_to_cache(str(order_id), json.dumps(response.model_dump()))
+    await set_order_to_cache(
+        str(order_id),
+        json.dumps(response.model_dump(mode="json")),
+    )
     return response
 
 
@@ -85,7 +91,10 @@ async def update_order_status(
     await invalidate_order_cache(str(order_id))
 
     response = OrderResponse.model_validate(order)
-    await set_order_to_cache(str(order_id), json.dumps(response.model_dump()))
+    await set_order_to_cache(
+        str(order_id),
+        json.dumps(response.model_dump(mode="json")),
+    )
     return response
 
 

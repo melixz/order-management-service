@@ -1,11 +1,11 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.order_management_service.core.database import get_db
-from src.order_management_service.core.rate_limiter import RateLimiter
+from src.order_management_service.core.rate_limiter import rate_limiter_dependency
 from src.order_management_service.core.security import get_current_user
 from src.order_management_service.schemas.order import (
     OrderCreate,
@@ -39,7 +39,7 @@ async def create_order_endpoint(
     order_data: OrderCreate,
     db: DbSession,
     current_user: CurrentUser,
-    _: None = RateLimiter,
+    _rate_limit: Annotated[None, Depends(rate_limiter_dependency)],
 ) -> OrderResponse:
     order = await create_order(
         db=db,
@@ -56,9 +56,14 @@ async def create_order_endpoint(
 async def get_order_endpoint(
     order_id: UUID,
     db: DbSession,
-    _current_user: CurrentUser,
+    current_user: CurrentUser,
 ) -> OrderResponse:
     order = await get_order_by_id(db, order_id)
+    if order.user_id != current_user["id"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions to view this order",
+        )
     return order
 
 
@@ -87,7 +92,13 @@ async def update_order_status_endpoint(
 async def get_user_orders_endpoint(
     user_id: int,
     db: DbSession,
-    _current_user: CurrentUser,
+    current_user: CurrentUser,
 ) -> list[OrderResponse]:
+    if current_user["id"] != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions to view these orders",
+        )
+
     orders = await get_user_orders(db, user_id)
     return [OrderResponse.model_validate(order) for order in orders]

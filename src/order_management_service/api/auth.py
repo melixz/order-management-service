@@ -3,9 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.order_management_service.core.database import get_db
-from src.order_management_service.core.rate_limiter import RateLimiter
+from src.order_management_service.core.rate_limiter import rate_limiter_dependency
 from src.order_management_service.schemas.auth import Token
 from src.order_management_service.schemas.user import UserCreate, UserResponse
 from src.order_management_service.services.auth_service import (
@@ -43,7 +42,7 @@ async def register(
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: DbSession,
-    _: None = RateLimiter,
+    _rate_limit: Annotated[None, Depends(rate_limiter_dependency)],
 ) -> Token:
     return await authenticate_user(
         db,
