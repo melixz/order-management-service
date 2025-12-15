@@ -1,0 +1,15 @@
+[project]
+name = "order-management-service"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.17.2",
+    "fastapi[standard]>=0.124.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "ruff>=0.14.9",
+]
