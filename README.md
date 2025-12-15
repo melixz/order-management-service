@@ -37,7 +37,7 @@ docker-compose up --build
 uv run uvicorn src.order_management_service.main:app --host 0.0.0.0 --port 8000
 ```
 
-Переменные окружения:
+Переменные окружения можно задать через файл `.env` (см. `.env.example`) или напрямую в окружении:
 
 - `DATABASE_URL` — строка подключения к PostgreSQL (asyncpg).
 - `REDIS_URL` — URL Redis.
