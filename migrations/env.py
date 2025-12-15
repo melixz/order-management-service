@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from src.order_management_service.core.database import Base  # noqa: E402
+from src.order_management_service.models import user, order  # noqa: F401
 
 
 config = context.config
